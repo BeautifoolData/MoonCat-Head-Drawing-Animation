@@ -1,0 +1,547 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mooncat Head Drawing Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a0033, #330066);
+            font-family: 'Courier New', monospace;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(51, 0, 48, 0.3);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid #e600d7;
+            box-shadow: 0 0 30px rgba(230, 0, 215, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .left-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .right-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 300px;
+        }
+
+        .step-info {
+            background: rgba(51, 0, 48, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e600d7;
+            min-height: 400px;
+        }
+
+        .step-info h3 {
+            margin: 0 0 15px 0;
+            color: #e600d7;
+            font-size: 1.3em;
+        }
+
+        .step-list {
+            color: #ff66f6;
+            line-height: 1.6;
+        }
+
+        .step-list div {
+            margin: 8px 0;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .step-list .current-step {
+            background: rgba(230, 0, 215, 0.2);
+            border-left: 3px solid #e600d7;
+            padding-left: 10px;
+            transform: translateX(5px);
+        }
+
+        .color-picker-section {
+            background: rgba(51, 0, 48, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e600d7;
+            margin-top: 20px;
+        }
+
+        .color-picker-section h3 {
+            margin: 0 0 15px 0;
+            color: #e600d7;
+            font-size: 1.1em;
+        }
+
+        .color-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+
+        .color-control label {
+            min-width: 80px;
+            color: #ff66f6;
+        }
+
+        .color-control input[type="color"] {
+            width: 30px;
+            height: 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+        }
+
+        .color-control input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-control input[type="color"]::-webkit-color-swatch {
+            border: 1px solid #666;
+            border-radius: 3px;
+        }
+
+        .preset-btn {
+            padding: 4px 8px;
+            background: rgba(230, 0, 215, 0.2);
+            color: #ff66f6;
+            border: 1px solid #e600d7;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(230, 0, 215, 0.4);
+        }
+
+        h1 {
+            text-align: center;
+            color: #e600d7;
+            text-shadow: 0 0 10px rgba(230, 0, 215, 0.5);
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .pixel-canvas {
+            display: grid;
+            grid-template-columns: repeat(11, 25px);
+            grid-template-rows: repeat(11, 25px);
+            gap: 1px;
+            background: #666;
+            padding: 10px;
+            border-radius: 10px;
+            border: 3px solid #e600d7;
+            box-shadow: 0 0 20px rgba(230, 0, 215, 0.4);
+        }
+
+        .pixel {
+            width: 25px;
+            height: 25px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #e600d7, #ff66f6);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(230, 0, 215, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 0, 215, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #ff66f6;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .palette {
+            background: rgba(51, 0, 48, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e600d7;
+        }
+
+        .palette h3 {
+            margin: 0 0 10px 0;
+            color: #e600d7;
+        }
+
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Mooncat Head Drawing ✨</h1>
+        
+        <div class="palette">
+            <h3>Color Palette</h3>
+            <div class="color-item">
+                <div class="color-swatch" style="background: #e600d7"></div>
+                <span>Face/Ears (#e600d7)</span>
+            </div>
+            <div class="color-item">
+                <div class="color-swatch" style="background: #330030"></div>
+                <span>Outline/Eyes (#330030)</span>
+            </div>
+            <div class="color-item">
+                <div class="color-swatch" style="background: #c199ff"></div>
+                <span>Nose/Ear holes (#c199ff)</span>
+            </div>
+            <div class="color-item">
+                <div class="color-swatch" style="background: #ff66f6"></div>
+                <span>Whiskers (#ff66f6)</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="left-section">
+                <div class="canvas-container">
+                    <div class="pixel-canvas" id="canvas"></div>
+                </div>
+
+                <div class="controls">
+                    <button onclick="startAnimation()">Start Animation</button>
+                    <button onclick="resetCanvas()">Reset</button>
+                    <button onclick="toggleSpeed()">Speed: Normal</button>
+                </div>
+
+                <div class="status" id="status">Ready to draw your mooncat!</div>
+            </div>
+
+            <div class="right-section">
+                <div class="step-info">
+                    <h3>Drawing Steps</h3>
+                    <div class="step-list" id="stepList">
+                        <div id="step1">1. Drawing the main face area</div>
+                        <div id="step2">2. Drawing the chin</div>
+                        <div id="step3">3. Drawing the forehead</div>
+                        <div id="step4">4. Drawing the ears</div>
+                        <div id="step5">5. Drawing the outline</div>
+                        <div id="step6">6. Drawing the eyes</div>
+                        <div id="step7">7. Drawing the nose</div>
+                        <div id="step8">8. Drawing the whiskers</div>
+                        <div id="step9">9. Adding ear hole details</div>
+                    </div>
+                </div>
+
+                <div class="color-picker-section">
+                    <h3>Canvas Colors</h3>
+                    <div class="color-control">
+                        <label>Canvas BG:</label>
+                        <input type="color" id="canvasBgColor" value="#666666" onchange="updateCanvasColors()">
+                        <button class="preset-btn" onclick="setCanvasPreset('#666666')">Default</button>
+                        <button class="preset-btn" onclick="setCanvasPreset('#333333')">Dark</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const statusDiv = document.getElementById('status');
+        let pixels = [];
+        let isAnimating = false;
+        let animationSpeed = 500; // ms between steps
+        let speedButton = document.querySelector('button[onclick="toggleSpeed()"]');
+
+        // Colors
+        const COLORS = {
+            face: '#e600d7',
+            outline: '#330030',
+            eyes: '#330030',
+            nose: '#c199ff',
+            earHole: '#c199ff',
+            whiskers: '#ff66f6'
+        };
+
+        // Initialize canvas
+        function initCanvas() {
+            canvas.innerHTML = '';
+            pixels = [];
+            for (let y = 0; y < 11; y++) {
+                pixels[y] = [];
+                for (let x = 0; x < 11; x++) {
+                    const pixel = document.createElement('div');
+                    pixel.className = 'pixel';
+                    pixel.style.left = (x * 30) + 'px';
+                    pixel.style.top = (y * 30) + 'px';
+                    pixel.dataset.x = x;
+                    pixel.dataset.y = y;
+                    canvas.appendChild(pixel);
+                    pixels[y][x] = pixel;
+                }
+            }
+            // Preserve current color settings
+            updateCanvasColors();
+        }
+
+        function setPixel(x, y, color) {
+            if (pixels[y] && pixels[y][x]) {
+                pixels[y][x].style.backgroundColor = color;
+                pixels[y][x].style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    if (pixels[y] && pixels[y][x]) {
+                        pixels[y][x].style.transform = 'scale(1)';
+                    }
+                }, 200);
+            }
+        }
+
+        async function fillRow(startX, y, length, color) {
+            for (let i = 0; i < length; i++) {
+                setPixel(startX + i, y, color);
+                await sleep(animationSpeed / 15); // Show each pixel individually
+            }
+        }
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function drawStep(stepNum, description, drawFunction) {
+            statusDiv.textContent = `Step ${stepNum}: ${description}`;
+            
+            // Update step list visual feedback
+            updateStepList(stepNum);
+            
+            await drawFunction();
+            await sleep(animationSpeed);
+        }
+
+        function updateCanvasColors() {
+            const canvasBg = document.getElementById('canvasBgColor').value;
+            
+            // Update canvas background only
+            canvas.style.background = canvasBg;
+        }
+
+        function setCanvasPreset(color) {
+            document.getElementById('canvasBgColor').value = color;
+            updateCanvasColors();
+        }
+
+        function updateStepList(currentStep) {
+            // Reset all steps
+            for (let i = 1; i <= 9; i++) {
+                const stepElement = document.getElementById(`step${i}`);
+                stepElement.className = '';
+                
+                if (i < currentStep) {
+                    stepElement.className = 'completed-step';
+                } else if (i === currentStep) {
+                    stepElement.className = 'current-step';
+                }
+            }
+        }
+
+        async function startAnimation() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            const startButton = document.querySelector('button[onclick="startAnimation()"]');
+            startButton.disabled = true;
+            
+            resetCanvas();
+
+            try {
+                // Step 1: Draw face (main rectangle)
+                await drawStep(1, "Drawing the main face area", async () => {
+                    for (let row = 4; row <= 8; row++) {
+                        await fillRow(1, row, 9, COLORS.face);
+                    }
+                });
+
+                // Step 2: Draw chin
+                await drawStep(2, "Drawing the chin", async () => {
+                    await fillRow(2, 9, 7, COLORS.face);
+                });
+
+                // Step 3: Draw forehead
+                await drawStep(3, "Drawing the forehead", async () => {
+                    await fillRow(2, 3, 7, COLORS.face);
+                });
+
+                // Step 4: Draw ears
+                await drawStep(4, "Drawing the ears", async () => {
+                    // Left ear
+                    setPixel(2, 1, COLORS.face);
+                    await sleep(animationSpeed / 4);
+                    await fillRow(2, 2, 2, COLORS.face);
+                    
+                    // Right ear
+                    setPixel(8, 1, COLORS.face);
+                    await sleep(animationSpeed / 4);
+                    await fillRow(7, 2, 2, COLORS.face);
+                });
+
+                // Step 5: Draw outline
+                await drawStep(5, "Drawing the outline", async () => {
+                    // Outline the entire shape
+                    const outlinePoints = [
+                        // Left ear outline
+                        [1,1], [2,0], [3,1], [1,2], [1,3],
+                        // Top of head 
+                        [1,3], [4,2], [5,2], [6,2], [9,2], [9,3],
+                        // Right ear outline
+                        [7,1], [8,0], [9,1],
+                        // Right side of face
+                        [10,4], [10,5], [10,6], [10,7], [10,8],
+                        // Right side of chin
+                        [9,9],
+                        // Bottom of chin
+                        [8,10], [7,10], [6,10], [5,10], [4,10], [3,10],
+                        // Left side of chin
+                        [2,10], [1,9],
+                        // Left side of face
+                        [0,8], [0,7], [0,6], [0,5], [0,4], [0,3]
+                    ];
+
+                    for (let [x, y] of outlinePoints) {
+                        setPixel(x, y, COLORS.outline);
+                        await sleep(50);
+                    }
+                });
+
+                // Step 6: Draw eyes
+                await drawStep(6, "Drawing the eyes", async () => {
+                    setPixel(3, 5, COLORS.eyes);
+                    await sleep(animationSpeed / 3);
+                    setPixel(7, 5, COLORS.eyes);
+                });
+
+                // Step 7: Draw nose
+                await drawStep(7, "Drawing the nose", async () => {
+                    setPixel(5, 7, COLORS.nose);
+                });
+
+                // Step 8: Draw whiskers
+                await drawStep(8, "Drawing the whiskers", async () => {
+                    await fillRow(2, 7, 2, COLORS.whiskers);
+                    await fillRow(7, 7, 2, COLORS.whiskers);
+                });
+
+                // Step 9: Add ear holes
+                await drawStep(9, "Adding ear hole details", async () => {
+                    setPixel(2, 2, COLORS.earHole);
+                    await sleep(animationSpeed / 2);
+                    setPixel(8, 2, COLORS.earHole);
+                });
+
+                statusDiv.textContent = "🌙✨ Mooncat complete! Ready to purr in the metaverse! ✨🌙";
+                
+            } catch (error) {
+                statusDiv.textContent = "Animation interrupted";
+            } finally {
+                isAnimating = false;
+                startButton.disabled = false;
+            }
+        }
+
+        function resetCanvas() {
+            initCanvas();
+            statusDiv.textContent = "Canvas cleared - ready to draw!";
+            // Reset step visual indicators
+            for (let i = 1; i <= 9; i++) {
+                const stepElement = document.getElementById(`step${i}`);
+                stepElement.className = '';
+            }
+        }
+
+        function toggleSpeed() {
+            if (animationSpeed === 500) {
+                animationSpeed = 200;
+                speedButton.textContent = 'Speed: Fast';
+            } else if (animationSpeed === 200) {
+                animationSpeed = 100;
+                speedButton.textContent = 'Speed: Very Fast';
+            } else {
+                animationSpeed = 500;
+                speedButton.textContent = 'Speed: Normal';
+            }
+        }
+
+        // Initialize on load
+        initCanvas();
+    </script>
+</body>
+</html>
